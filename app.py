@@ -47,9 +47,12 @@ def hf_detect(text):
             return out[0]["generated_text"]
     return None
 
-def regex_detect(text):
-    questions = re.findall(r"(\d+\. .*?(?:A\).+?B\).+?C\).+?D\).+?)", text, re.DOTALL)
-    return "\n\n".join(questions) if questions else None
+def regex_detect(text: str):
+    # Matches "1. Question text ... A) option ... B) option ... C) option ... D) option"
+    pattern = r"(\d+\..*?(?:A\).+?B\).+?C\).+?D\).+?))(?=\d+\.|$)"
+    questions = re.findall(pattern, text, re.S)
+    return "\n\n".join(q.strip() for q in questions) if questions else None
+
 
 @st.cache_data(show_spinner=False)
 def detect_questions_pagewise(pages, use_ai=False):
